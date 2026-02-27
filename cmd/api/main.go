@@ -39,6 +39,10 @@ func main() {
 	authService := auth.NewService(userRepo)
 	authHandler := auth.NewHandler(authService)
 	auth.AuthRoutes(r, authHandler)
+	// USER ROUTES
+	userService := user.NewService(userRepo)
+	userHandler := user.NewHandler(userService)
+	user.UserRoutes(r, userHandler)
 	server := &http.Server{
 		Addr:         ":" + cfg.Port,
 		Handler:      r,
