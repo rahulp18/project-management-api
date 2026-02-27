@@ -31,3 +31,19 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(res)
 }
+
+func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
+	var inputData LoginRequest
+	err := json.NewDecoder(r.Body).Decode(&inputData)
+	if err != nil {
+		http.Error(w, "Invalid data email and password required", http.StatusBadRequest)
+		return
+	}
+	data, err := h.service.login(r.Context(), inputData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(data)
+}

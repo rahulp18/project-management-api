@@ -29,3 +29,21 @@ func (repo *Repository) CreateUser(ctx context.Context, user UserInput) (User, e
 	return data, nil
 
 }
+func (repo *Repository) FindByEmail(ctx context.Context, email string) (*User, error) {
+	user := &User{}
+
+	query := `
+		SELECT id, email, name, password, created_at, updated_at
+		FROM users
+		WHERE email = $1
+	`
+
+	err := repo.db.QueryRow(ctx, query, email).
+		Scan(&user.ID, &user.Email, &user.Name, &user.Password, &user.CreatedAt, &user.UpdatedAt)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}

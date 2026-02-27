@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"project-management/internal/user"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Service struct {
@@ -16,7 +18,7 @@ func NewService(repo *user.Repository) *Service {
 	}
 }
 
-func (service *Service) register(ctx context.Context, inputData user.UserInput) (*RegisterResponse, error) {
+func (service *Service) register(ctx context.Context, inputData user.UserInput) (*AuthResponse, error) {
 	if inputData.Email == "" || inputData.Name == "" || inputData.Password == "" {
 		return nil, errors.New("Name email and password must required")
 	}
@@ -35,7 +37,34 @@ func (service *Service) register(ctx context.Context, inputData user.UserInput) 
 	if err != nil {
 		return nil, err
 	}
-	return &RegisterResponse{
+	return &AuthResponse{
+		SessionToken: token,
+	}, nil
+}
+
+func (service *Service) login(ctx context.Context, inputData LoginRequest) (*AuthResponse, error) {
+	if inputData.Email == "" || inputData.Password == "" {
+		return nil, errors.New("Invalid data")
+	}
+	user, err := service.userRepo.FindByEmail(ctx, inputData.Email)
+
+	if err != nil {
+		return nil, err
+	}
+	err = bcrypt.CompareHashAndPassword(
+		[]byte(user.Password),
+		[]byte(inputData.Password),
+	)
+
+	if err != nil {
+		return nil, errors.New("Invalid Email or Password")
+	}
+	// generate token
+	token, err := GenerateToken(user.ID, user.Email)
+	if err != nil {
+		return nil, err
+	}
+	return &AuthResponse{
 		SessionToken: token,
 	}, nil
 }
