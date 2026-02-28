@@ -97,3 +97,5 @@ We'll build:
 - **Integration tests** - Test API endpoints end-to-end
 - **Mocking** - Use interfaces for testable code
 - **Health checks** - Implement readiness and liveness probes
+  Migration apply command
+  migrate -path migrations -database "postgres://admin:password@localhost:5433/project_management?sslmode=disable" up
