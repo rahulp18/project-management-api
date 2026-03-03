@@ -10,6 +10,7 @@ import (
 	"project-management/internal/auth"
 	"project-management/internal/config"
 	"project-management/internal/database"
+	"project-management/internal/organization"
 	"project-management/internal/user"
 	"syscall"
 	"time"
@@ -43,6 +44,12 @@ func main() {
 	userService := user.NewService(userRepo)
 	userHandler := user.NewHandler(userService)
 	user.UserRoutes(r, userHandler)
+
+	orgRepo := organization.NewRepository(db.Pool)
+	orgService := organization.NewService(orgRepo)
+	orgHandler := organization.NewHandler(orgService)
+
+	organization.OrganizationRoutes(r, orgHandler)
 	server := &http.Server{
 		Addr:         ":" + cfg.Port,
 		Handler:      r,
